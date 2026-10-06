@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import { searchSingaporeMalls } from '../src/data/singaporeMallsRegistry.ts';
 
 // Known Singapore fallback destinations for instant autocomplete if OneMap is slow
 const COMMON_SG_DESTINATIONS = [
@@ -140,19 +141,41 @@ export default async function geocodeHandler(req: Request, res: Response) {
       throw new Error(`OneMap API error: ${response.status}`);
     }
 
+    // First, check local verified Singapore shopping malls & landmarks registry
+    const localMalls = searchSingaporeMalls(query).map(m => ({
+      title: m.name,
+      address: m.address,
+      latitude: m.latitude,
+      longitude: m.longitude,
+      postalCode: m.postalCode
+    }));
+
     const data = await response.json();
     if (data && Array.isArray(data.results) && data.results.length > 0) {
-      const results = data.results.slice(0, 6).map((item: any) => ({
+      const oneMapResults = data.results.slice(0, 6).map((item: any) => ({
         title: item.SEARCHVAL || item.BUILDING || item.ROAD_NAME,
         address: item.ADDRESS || `${item.BLK_NO || ''} ${item.ROAD_NAME || ''}`.trim(),
         latitude: parseFloat(item.LATITUDE),
         longitude: parseFloat(item.LONGITUDE),
         postalCode: item.POSTAL || ''
       }));
-      return res.json({ results, source: 'onemap' });
+
+      // Combine local verified mall (if matched) at top of list
+      const combined = [...localMalls];
+      for (const item of oneMapResults) {
+        if (!combined.some(c => Math.abs(c.latitude - item.latitude) < 0.001 && Math.abs(c.longitude - item.longitude) < 0.001)) {
+          combined.push(item);
+        }
+      }
+
+      return res.json({ results: combined.slice(0, 7), source: localMalls.length > 0 ? 'verified_registry' : 'onemap' });
     }
 
-    // If OneMap yielded no results, fallback to matching common SG destinations
+    // If OneMap yielded no results, return local malls or common SG destinations
+    if (localMalls.length > 0) {
+      return res.json({ results: localMalls, source: 'verified_registry' });
+    }
+
     const lowerQuery = query.toLowerCase();
     const matched = COMMON_SG_DESTINATIONS.filter(d =>
       d.title.toLowerCase().includes(lowerQuery) ||
@@ -163,13 +186,26 @@ export default async function geocodeHandler(req: Request, res: Response) {
   } catch (error: any) {
     clearTimeout(timeoutId);
     console.warn('Geocoding OneMap error, using fallback:', error.message);
+
+    // Check local verified malls first
+    const localMalls = searchSingaporeMalls(query).map(m => ({
+      title: m.name,
+      address: m.address,
+      latitude: m.latitude,
+      longitude: m.longitude,
+      postalCode: m.postalCode
+    }));
+
+    if (localMalls.length > 0) {
+      return res.json({ results: localMalls, source: 'verified_registry' });
+    }
+
     const lowerQuery = query.toLowerCase();
     const matched = COMMON_SG_DESTINATIONS.filter(d =>
       d.title.toLowerCase().includes(lowerQuery) ||
       d.address.toLowerCase().includes(lowerQuery)
     );
 
-    // If query didn't match directly, still provide top suggestions
     const results = matched.length > 0 ? matched : COMMON_SG_DESTINATIONS.slice(0, 4);
     return res.json({ results, source: 'fallback' });
   }

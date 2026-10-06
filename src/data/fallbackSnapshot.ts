@@ -2,6 +2,7 @@ import { Carpark, EVCharger } from '../types/index.ts';
 import { calculateDistanceMeters } from '../utils/geo.ts';
 import { CARPARK_RATES_DATABASE, matchCarparkRateDefinition } from './carparkRates.ts';
 import { calculateParkingCost } from '../utils/rateCalculator.ts';
+import { SINGAPORE_MALLS_REGISTRY } from './singaporeMallsRegistry.ts';
 
 // Destination anchor: Marina Bay Sands (1.2842, 103.8596)
 export const MBS_ANCHOR = {
@@ -476,7 +477,25 @@ export function getFallbackCarparks(
 ): Carpark[] {
   const result: Carpark[] = [];
 
-  for (const raw of FALLBACK_CARPARKS_RAW) {
+  // Combine curated snapshots with full Singapore shopping malls registry
+  const mallSnapshots: RawCarparkSnapshot[] = SINGAPORE_MALLS_REGISTRY.map(m => ({
+    id: m.id,
+    name: m.name,
+    agency: m.agency || 'COMMERCIAL',
+    area: m.region,
+    latitude: m.latitude,
+    longitude: m.longitude,
+    availableLots: m.approximateLots,
+    lotType: 'C',
+    evChargers: []
+  }));
+
+  const allCandidateCarparks: RawCarparkSnapshot[] = [
+    ...FALLBACK_CARPARKS_RAW,
+    ...mallSnapshots.filter(m => !FALLBACK_CARPARKS_RAW.some(r => r.name.toLowerCase() === m.name.toLowerCase()))
+  ];
+
+  for (const raw of allCandidateCarparks) {
     const distMeters = calculateDistanceMeters(destLat, destLng, raw.latitude, raw.longitude);
     const distKm = Number((distMeters / 1000).toFixed(2));
 

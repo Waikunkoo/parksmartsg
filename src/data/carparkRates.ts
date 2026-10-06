@@ -97,6 +97,65 @@ function parseSegmentToRules(str: string, dayType: DayType, defaultStart: string
  */
 const CURATED_CARPARK_RATES: CarparkRateDefinition[] = [
   {
+    normalisedName: 'waterway point',
+    name: 'Waterway Point',
+    category: 'Central, North & North East',
+    aliases: ['waterway point', 'wwp', 'waterway point punggol'],
+    publishedRateText: {
+      weekdays: 'Mon-Fri 07:00-17:00: $1.40 for 1st hr, $0.70/subsequent 30 mins | 17:00-07:00: $2.40 per entry',
+      saturday: '07:00-07:00 next day: $1.60 for 1st hr, $0.80/subsequent 30 mins',
+      sunday_ph: '07:00-07:00 next day: $1.60 for 1st hr, $0.80/subsequent 30 mins'
+    },
+    rules: [
+      { dayType: 'weekday', startTime: '07:00', endTime: '17:00', type: 'first_block', blockMinutes: 60, amountSGD: 1.40 },
+      { dayType: 'weekday', startTime: '07:00', endTime: '17:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 0.70 },
+      { dayType: 'weekday', startTime: '17:00', endTime: '07:00', type: 'per_entry', blockMinutes: 840, amountSGD: 2.40 },
+      { dayType: 'saturday', startTime: '07:00', endTime: '07:00', type: 'first_block', blockMinutes: 60, amountSGD: 1.60 },
+      { dayType: 'saturday', startTime: '07:00', endTime: '07:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 0.80 },
+      { dayType: 'sunday_ph', startTime: '07:00', endTime: '07:00', type: 'first_block', blockMinutes: 60, amountSGD: 1.60 },
+      { dayType: 'sunday_ph', startTime: '07:00', endTime: '07:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 0.80 }
+    ],
+    defaultAgency: 'COMMERCIAL'
+  },
+  {
+    normalisedName: 'jewel changi airport',
+    name: 'Jewel Changi Airport',
+    category: 'East',
+    aliases: ['jewel', 'changi jewel', 'jewel airport'],
+    publishedRateText: {
+      weekdays: 'General: $2.40 per hr (or $0.04/min first 90 mins)',
+      saturday: 'Same as weekdays',
+      sunday_ph: 'Same as weekdays'
+    },
+    rules: [
+      { dayType: 'weekday', startTime: '00:00', endTime: '24:00', type: 'flat_hourly', blockMinutes: 60, amountSGD: 2.40 },
+      { dayType: 'saturday', startTime: '00:00', endTime: '24:00', type: 'flat_hourly', blockMinutes: 60, amountSGD: 2.40 },
+      { dayType: 'sunday_ph', startTime: '00:00', endTime: '24:00', type: 'flat_hourly', blockMinutes: 60, amountSGD: 2.40 }
+    ],
+    defaultAgency: 'COMMERCIAL'
+  },
+  {
+    normalisedName: 'paya lebar quarter',
+    name: 'Paya Lebar Quarter (PLQ Mall)',
+    category: 'East',
+    aliases: ['plq', 'plq mall', 'paya lebar quarter'],
+    publishedRateText: {
+      weekdays: 'Mon-Fri 06:00-18:00: $1.96 for 1st hr, $0.98/subsequent 30 mins | 18:00-06:00: $3.27 per entry',
+      saturday: '06:00-06:00 next day: $2.18 for 1st hr, $1.09/subsequent 30 mins',
+      sunday_ph: 'Same as Saturday'
+    },
+    rules: [
+      { dayType: 'weekday', startTime: '06:00', endTime: '18:00', type: 'first_block', blockMinutes: 60, amountSGD: 1.96 },
+      { dayType: 'weekday', startTime: '06:00', endTime: '18:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 0.98 },
+      { dayType: 'weekday', startTime: '18:00', endTime: '06:00', type: 'per_entry', blockMinutes: 720, amountSGD: 3.27 },
+      { dayType: 'saturday', startTime: '06:00', endTime: '06:00', type: 'first_block', blockMinutes: 60, amountSGD: 2.18 },
+      { dayType: 'saturday', startTime: '06:00', endTime: '06:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 1.09 },
+      { dayType: 'sunday_ph', startTime: '06:00', endTime: '06:00', type: 'first_block', blockMinutes: 60, amountSGD: 2.18 },
+      { dayType: 'sunday_ph', startTime: '06:00', endTime: '06:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 1.09 }
+    ],
+    defaultAgency: 'COMMERCIAL'
+  },
+  {
     normalisedName: 'the strategy',
     name: 'The Strategy (International Business Park)',
     category: 'West',
