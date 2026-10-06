@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, MapPin, Navigation, Loader2 } from 'lucide-react';
+import { Search, MapPin, Navigation, Loader2, X } from 'lucide-react';
 import { GeocodeResult, SearchParams } from '../types/index.ts';
 
 interface ScreenSearchProps {
@@ -81,6 +81,35 @@ export default function ScreenSearch({ onSearch, initialParams }: ScreenSearchPr
 
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click or Escape key
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setShowDropdown(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   // Save preferences
   useEffect(() => {
@@ -229,7 +258,7 @@ export default function ScreenSearch({ onSearch, initialParams }: ScreenSearchPr
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 md:p-7 space-y-6">
         
         {/* 1. Destination Field */}
-        <div className="relative space-y-2">
+        <div ref={dropdownRef} className="relative space-y-2">
           <label htmlFor="destination-input" className="block text-xs font-semibold text-slate-700 tracking-wide">
             Destination
           </label>
@@ -245,12 +274,30 @@ export default function ScreenSearch({ onSearch, initialParams }: ScreenSearchPr
               onFocus={() => {
                 if (suggestions.length > 0) setShowDropdown(true);
               }}
+              onClick={() => {
+                if (suggestions.length > 0) setShowDropdown(true);
+              }}
               placeholder="e.g. Marina Bay Sands, Suntec, Bugis"
               className="w-full h-12 pl-10 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition-all"
             />
-            {isSearchingGeo && (
+            {isSearchingGeo ? (
               <Loader2 className="absolute right-3.5 w-4 h-4 text-slate-400 animate-spin" />
-            )}
+            ) : destinationQuery ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setDestinationQuery('');
+                  setSelectedLocation(null);
+                  setSuggestions([]);
+                  setShowDropdown(false);
+                  inputRef.current?.focus();
+                }}
+                className="absolute right-3 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors"
+                aria-label="Clear destination"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            ) : null}
           </div>
 
           {/* Autocomplete Dropdown */}
