@@ -530,6 +530,8 @@ export function getFallbackCarparks(
       costBreakdown: breakdown,
       publishedRateText,
       isApproximateRate: isApprox,
+      isLocalRateSource: Boolean(rateDef),
+      rateSource: 'local_database',
       evChargers: raw.evChargers,
       lastUpdated: '1 min ago (Live feed synced)',
       isFallback: true

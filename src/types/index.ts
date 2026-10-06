@@ -57,6 +57,8 @@ export interface Carpark {
   costBreakdown: string;
   publishedRateText?: string;
   isApproximateRate?: boolean;
+  isLocalRateSource?: boolean;
+  rateSource?: 'lta_live' | 'local_database';
   evChargers: EVCharger[];
   lastUpdated: string;
   badge?: 'Best value' | 'Cheapest' | 'Nearest';

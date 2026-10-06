@@ -1,4 +1,4 @@
-import { ArrowLeft, Navigation, Zap, Accessibility, Clock, Info, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Navigation, Zap, Accessibility, Clock, Info, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Carpark, SearchParams } from '../types/index.ts';
 
 interface ScreenDetailProps {
@@ -147,6 +147,16 @@ export default function ScreenDetail({
               </p>
             )}
           </div>
+
+          {/* Local datasource notice */}
+          {carpark.isLocalRateSource && (
+            <div className="flex items-start gap-2.5 bg-amber-50/90 border border-amber-200/90 rounded-xl p-3 text-xs text-amber-900 leading-normal shadow-xs">
+              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <p>
+                <span className="font-semibold">Note:</span> Car park rates may be outdated, please refer to the official website for latest rates.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* EV Chargers Section */}

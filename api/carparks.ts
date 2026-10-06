@@ -179,6 +179,8 @@ export default async function carparksHandler(req: Request, res: Response) {
           costBreakdown: breakdown,
           publishedRateText,
           isApproximateRate: isApprox,
+          isLocalRateSource: Boolean(rateDef),
+          rateSource: 'local_database',
           evChargers: linkedEVs,
           lastUpdated: `${nowTimeString} (Live LTA DataMall)`,
           isFallback: false
