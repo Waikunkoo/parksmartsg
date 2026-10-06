@@ -148,8 +148,8 @@ export default function ScreenDetail({
             )}
           </div>
 
-          {/* Local datasource notice */}
-          {carpark.isLocalRateSource && (
+          {/* Local datasource notice (Only shown when rate comes from local datasource and NOT LTA) */}
+          {carpark.isLocalRateSource && carpark.agency !== 'LTA' && carpark.agency !== 'HDB' && carpark.agency !== 'URA' && (
             <div className="flex items-start gap-2.5 bg-amber-50/90 border border-amber-200/90 rounded-xl p-3 text-xs text-amber-900 leading-normal shadow-xs">
               <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <p>

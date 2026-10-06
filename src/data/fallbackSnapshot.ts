@@ -515,6 +515,8 @@ export function getFallbackCarparks(
       publishedRateText = rateDef.publishedRateText.weekdays;
     }
 
+    const isFromLTAAgency = ['LTA', 'HDB', 'URA'].includes(raw.agency);
+
     result.push({
       id: raw.id,
       name: raw.name,
@@ -530,8 +532,8 @@ export function getFallbackCarparks(
       costBreakdown: breakdown,
       publishedRateText,
       isApproximateRate: isApprox,
-      isLocalRateSource: Boolean(rateDef),
-      rateSource: 'local_database',
+      isLocalRateSource: !isFromLTAAgency,
+      rateSource: isFromLTAAgency ? 'lta_live' : 'local_database',
       evChargers: raw.evChargers,
       lastUpdated: '1 min ago (Live feed synced)',
       isFallback: true

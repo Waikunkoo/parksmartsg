@@ -164,6 +164,8 @@ export default async function carparksHandler(req: Request, res: Response) {
               : rateDef.publishedRateText.weekdays;
         }
 
+        const isFromLTAAgency = ['LTA', 'HDB', 'URA'].includes(item.Agency);
+
         parsedList.push({
           id: item.CarParkID || `cp-${item.cLat}-${item.cLng}`,
           name: name,
@@ -179,8 +181,8 @@ export default async function carparksHandler(req: Request, res: Response) {
           costBreakdown: breakdown,
           publishedRateText,
           isApproximateRate: isApprox,
-          isLocalRateSource: Boolean(rateDef),
-          rateSource: 'local_database',
+          isLocalRateSource: !isFromLTAAgency,
+          rateSource: isFromLTAAgency ? 'lta_live' : 'local_database',
           evChargers: linkedEVs,
           lastUpdated: `${nowTimeString} (Live LTA DataMall)`,
           isFallback: false
