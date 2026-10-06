@@ -31,7 +31,7 @@ export default async function carparksHandler(req: Request, res: Response) {
     lng = MBS_ANCHOR.longitude;
   }
 
-  const ltaKey = process.env.LTA_ACCOUNT_KEY;
+  const ltaKey = (process.env.LTA_ACCOUNT_KEY || process.env.LTA_API_KEY || (req.headers['accountkey'] as string) || (req.headers['account-key'] as string) || '').trim();
 
   try {
     let rawCarparks: any[] = [];
@@ -44,25 +44,42 @@ export default async function carparksHandler(req: Request, res: Response) {
         isLive = true;
       } else {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
         try {
-          const resp = await fetch('https://datamall2.mytransport.sg/ltaodataservice/CarParkAvailabilityv2', {
-            signal: controller.signal,
-            headers: {
-              'AccountKey': ltaKey,
-              'Accept': 'application/json'
+          // LTA DataMall returns up to 500 records per page.
+          // Fetch all pages across Singapore in parallel to cover Tampines, Jurong, Woodlands, Bedok, etc.
+          const pageSkips = [0, 500, 1000, 1500, 2000, 2500];
+          const pagePromises = pageSkips.map(async (skip) => {
+            const url = skip > 0
+              ? `https://datamall2.mytransport.sg/ltaodataservice/CarParkAvailabilityv2?$skip=${skip}`
+              : 'https://datamall2.mytransport.sg/ltaodataservice/CarParkAvailabilityv2';
+            try {
+              const resp = await fetch(url, {
+                signal: controller.signal,
+                headers: {
+                  'AccountKey': ltaKey,
+                  'Accept': 'application/json'
+                }
+              });
+              if (resp.ok) {
+                const json = await resp.json();
+                return Array.isArray(json?.value) ? json.value : [];
+              }
+            } catch (err: any) {
+              console.warn(`LTA page skip=${skip} failed:`, err?.message);
             }
+            return [];
           });
+
+          const pages = await Promise.all(pagePromises);
           clearTimeout(timeoutId);
 
-          if (resp.ok) {
-            const json = await resp.json();
-            if (json && Array.isArray(json.value)) {
-              rawCarparks = json.value;
-              carparkCache = { timestamp: now, data: rawCarparks };
-              isLive = true;
-            }
+          const combined = pages.flat();
+          if (combined.length > 0) {
+            rawCarparks = combined;
+            carparkCache = { timestamp: now, data: rawCarparks };
+            isLive = true;
           }
         } catch (fetchErr: any) {
           clearTimeout(timeoutId);
@@ -76,29 +93,35 @@ export default async function carparksHandler(req: Request, res: Response) {
       // 1. Filter LotType === 'C' (Cars only)
       const carLots = rawCarparks.filter(item => item.LotType === 'C' && item.Location);
 
-      // 2. Compute distance and filter within 1 km (1000m)
-      const within1km: any[] = [];
-      for (const item of carLots) {
-        const parts = item.Location.trim().split(/\s+/);
-        if (parts.length >= 2) {
-          const cLat = parseFloat(parts[0]);
-          const cLng = parseFloat(parts[1]);
-          if (!isNaN(cLat) && !isNaN(cLng)) {
-            const distMeters = calculateDistanceMeters(lat, lng, cLat, cLng);
-            if (distMeters <= 1000) {
-              within1km.push({
-                ...item,
-                cLat,
-                cLng,
-                distMeters
-              });
+      // 2. Compute distance and filter within proximity (1.2km, expanding to 2.5km if needed)
+      let within1km: any[] = [];
+      const radiusTiers = [1200, 2200, 3500];
+
+      for (const maxRadius of radiusTiers) {
+        within1km = [];
+        for (const item of carLots) {
+          const parts = item.Location.trim().split(/\s+/);
+          if (parts.length >= 2) {
+            const cLat = parseFloat(parts[0]);
+            const cLng = parseFloat(parts[1]);
+            if (!isNaN(cLat) && !isNaN(cLng)) {
+              const distMeters = calculateDistanceMeters(lat, lng, cLat, cLng);
+              if (distMeters <= maxRadius) {
+                within1km.push({
+                  ...item,
+                  cLat,
+                  cLng,
+                  distMeters
+                });
+              }
             }
           }
         }
+        if (within1km.length >= 3) break;
       }
 
       // Fetch nearby EV chargers to link chargers within 100m of car parks
-      const nearbyEVs = await fetchEVChargersNearby(lat, lng, 1200);
+      const nearbyEVs = await fetchEVChargersNearby(lat, lng, 1500);
 
       const parsedList: Carpark[] = [];
       const nowTimeString = new Date().toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit', hour12: false });

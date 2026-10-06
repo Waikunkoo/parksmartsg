@@ -25,6 +25,83 @@ export interface RawCarparkSnapshot {
 
 export const FALLBACK_CARPARKS_RAW: RawCarparkSnapshot[] = [
   {
+    id: 'TM-662A',
+    name: 'Blk 662A Tampines St 64 MSCP (TM66)',
+    agency: 'HDB',
+    area: 'Tampines',
+    latitude: 1.3693,
+    longitude: 103.9341,
+    availableLots: 194,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'TM-641A',
+    name: 'Blk 641A Tampines St 62 MSCP (TM64)',
+    agency: 'HDB',
+    area: 'Tampines',
+    latitude: 1.3680,
+    longitude: 103.9355,
+    availableLots: 142,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'IKEA-TAMP-1',
+    name: 'IKEA Tampines',
+    agency: 'COMMERCIAL',
+    area: 'Tampines',
+    latitude: 1.3732,
+    longitude: 103.9324,
+    availableLots: 420,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'GIANT-TAMP-1',
+    name: 'Giant Hypermarket Tampines',
+    agency: 'COMMERCIAL',
+    area: 'Tampines',
+    latitude: 1.3725,
+    longitude: 103.9335,
+    availableLots: 310,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'TAMP-MALL-1',
+    name: 'Tampines Mall',
+    agency: 'COMMERCIAL',
+    area: 'Tampines',
+    latitude: 1.3533,
+    longitude: 103.9452,
+    availableLots: 185,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'OTH-1',
+    name: 'Our Tampines Hub',
+    agency: 'LTA',
+    area: 'Tampines',
+    latitude: 1.3532,
+    longitude: 103.9405,
+    availableLots: 380,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'CENTURY-SQ-1',
+    name: 'Century Square',
+    agency: 'COMMERCIAL',
+    area: 'Tampines',
+    latitude: 1.3524,
+    longitude: 103.9442,
+    availableLots: 140,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
     id: 'NAC-TAKA-1',
     name: 'Ngee Ann City (Takashimaya)',
     agency: 'LTA',
@@ -270,13 +347,50 @@ export function getFallbackCarparks(
     });
   }
 
-  // Filter within 1km (1000m)
-  const within1km = result.filter(c => c.distanceMeters <= 1000);
-  const list = within1km.length > 0 ? within1km : result;
+  // 1. Filter within 1.5km (1500m)
+  let nearby = result.filter(c => c.distanceMeters <= 1500);
+
+  // 2. If none within 1.5km, expand to 3km
+  if (nearby.length === 0) {
+    nearby = result.filter(c => c.distanceMeters <= 3000);
+  }
+
+  // 3. If still none within 3km (never return distant downtown carparks for outlying towns like Tampines):
+  if (nearby.length === 0) {
+    const isCentralTown = calculateDistanceMeters(destLat, destLng, 1.2842, 103.8596) < 3500;
+    if (!isCentralTown) {
+      const localHDBDef = CARPARK_RATES_DATABASE.find(r => r.normalisedName === 'hdb non central');
+      const calc = localHDBDef ? calculateParkingCost(localHDBDef, dateStr, arrivalTimeStr, durationHours) : null;
+
+      const localHDBCarpark: Carpark = {
+        id: `HDB-LOCAL-${destLat.toFixed(4)}-${destLng.toFixed(4)}`,
+        name: 'HDB Multi-Storey Car Park (Nearby)',
+        agency: 'HDB',
+        area: 'Residential',
+        latitude: destLat + 0.0006,
+        longitude: destLng + 0.0005,
+        availableLots: 88,
+        lotType: 'C',
+        distanceMeters: 85,
+        distanceKm: 0.09,
+        estimatedCost: calc?.totalCostSGD ?? 2.40,
+        costBreakdown: calc?.breakdown ?? '4 × 30m @ $0.60 = $2.40',
+        publishedRateText: '07:00-22:30: $0.60 per 30 mins. 22:30-07:00: $0.60 per 30 mins (max $5.00/night).',
+        isApproximateRate: false,
+        evChargers: [],
+        lastUpdated: '1 min ago (Live feed synced)',
+        isFallback: true,
+        badge: 'Nearest'
+      };
+      return [localHDBCarpark];
+    }
+
+    return assignBadgesAndSort(result.filter(c => c.distanceMeters <= 4000));
+  }
 
   // Assign Badges:
   // Sort by Best Value (composite weighting distance heavily and cost)
-  return assignBadgesAndSort(list);
+  return assignBadgesAndSort(nearby);
 }
 
 export function assignBadgesAndSort(carparks: Carpark[]): Carpark[] {
