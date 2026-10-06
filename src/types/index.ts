@@ -20,6 +20,7 @@ export interface RateRule {
 export interface CarparkRateDefinition {
   normalisedName: string;
   name: string;
+  category?: string;
   aliases: string[];
   publishedRateText: {
     weekdays: string;
@@ -28,6 +29,7 @@ export interface CarparkRateDefinition {
   };
   rules: RateRule[];
   defaultAgency?: 'LTA' | 'HDB' | 'URA' | 'COMMERCIAL';
+  isApproximate?: boolean;
 }
 
 export interface EVCharger {

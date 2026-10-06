@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import geocodeHandler from './api/geocode.ts';
 import carparksHandler from './api/carparks.ts';
 import carparkHandler from './api/carpark.ts';
+import ratesHandler from './api/rates.ts';
 import healthHandler from './api/health.ts';
 import evHandler from './api/ev.ts';
 
@@ -45,6 +46,15 @@ async function startServer() {
     } catch (err: any) {
       console.error('Error in /api/carpark:', err);
       res.status(500).json({ error: err.message || 'Carpark error' });
+    }
+  });
+
+  app.get('/api/rates', async (req, res) => {
+    try {
+      await ratesHandler(req, res);
+    } catch (err: any) {
+      console.error('Error in /api/rates:', err);
+      res.status(500).json({ error: err.message || 'Rates error' });
     }
   });
 
