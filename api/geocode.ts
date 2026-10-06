@@ -99,6 +99,20 @@ const COMMON_SG_DESTINATIONS = [
     latitude: 1.3252,
     longitude: 103.7490,
     postalCode: '609917'
+  },
+  {
+    title: 'The Star Vista',
+    address: '1 Vista Exchange Green, Singapore 138617',
+    latitude: 1.3070,
+    longitude: 103.7884,
+    postalCode: '138617'
+  },
+  {
+    title: 'Rochester Mall',
+    address: '35 Rochester Drive, Singapore 138639',
+    latitude: 1.3056,
+    longitude: 103.7880,
+    postalCode: '138639'
   }
 ];
 

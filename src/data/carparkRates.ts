@@ -303,7 +303,9 @@ const COMMON_ALIASES: Record<string, string[]> = {
   'velocity @ novena square': ['novena square', 'novena sq'],
   'raffles city': ['raffles city shopping', 'swissotel the stamford'],
   'the centrepoint': ['centrepoint'],
-  'wheelock place': ['wheelock']
+  'wheelock place': ['wheelock'],
+  'the star vista': ['the star vista', 'star vista', 'star vista mall', 'star vista carpark', '1 vista exchange green', 'the star performing arts centre'],
+  'star vista': ['the star vista', 'star vista', 'star vista mall', 'star vista carpark']
 };
 
 /**

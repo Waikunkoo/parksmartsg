@@ -25,6 +25,70 @@ export interface RawCarparkSnapshot {
 
 export const FALLBACK_CARPARKS_RAW: RawCarparkSnapshot[] = [
   {
+    id: 'STAR-VISTA-1',
+    name: 'The Star Vista',
+    agency: 'COMMERCIAL',
+    area: 'Buona Vista',
+    latitude: 1.3070,
+    longitude: 103.7884,
+    availableLots: 385,
+    lotType: 'C',
+    evChargers: [
+      {
+        id: 'ev-starvista-1',
+        operator: 'SP Mobility',
+        plugType: 'Type 2 & CCS2',
+        powerKW: '50 kW DC',
+        status: 'Available',
+        price: '$0.58/kWh'
+      }
+    ]
+  },
+  {
+    id: 'ROCHESTER-1',
+    name: 'Rochester Mall',
+    agency: 'COMMERCIAL',
+    area: 'Buona Vista',
+    latitude: 1.3056,
+    longitude: 103.7880,
+    availableLots: 190,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'METROPOLIS-1',
+    name: 'The Metropolis',
+    agency: 'COMMERCIAL',
+    area: 'Buona Vista',
+    latitude: 1.3062,
+    longitude: 103.7905,
+    availableLots: 340,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'HD-14',
+    name: 'Blk 14 Holland Drive MSCP (H14)',
+    agency: 'HDB',
+    area: 'Holland',
+    latitude: 1.3090,
+    longitude: 103.7915,
+    availableLots: 210,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'HOLLAND-RD-1',
+    name: 'Holland Road Shopping Centre',
+    agency: 'COMMERCIAL',
+    area: 'Holland',
+    latitude: 1.3105,
+    longitude: 103.7950,
+    availableLots: 160,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
     id: 'IBP-STRATEGY',
     name: 'The Strategy (International Business Park)',
     agency: 'COMMERCIAL',
