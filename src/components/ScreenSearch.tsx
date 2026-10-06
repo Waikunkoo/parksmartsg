@@ -338,37 +338,39 @@ export default function ScreenSearch({ onSearch, initialParams }: ScreenSearchPr
         </div>
 
         {/* 2 & 3. Date & Arrival Time (24-hour) */}
-        <div className="grid grid-cols-2 gap-3.5 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
           {/* Date */}
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 min-w-0">
             <label htmlFor="parking-date" className="block text-xs font-semibold text-slate-700 tracking-wide">
               Date
             </label>
-            <div className="relative">
+            <div className="relative min-w-0">
               <input
                 id="parking-date"
                 type="date"
                 value={dateStr}
                 onChange={(e) => handleDateChange(e.target.value)}
-                className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition-all"
+                className="w-full min-w-0 max-w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition-all block box-border"
               />
             </div>
             <p className="text-[11px] text-slate-500 pl-0.5">{dateLabel}</p>
           </div>
 
           {/* Arrival Time: 24-hour format, defaults to now rounded up to 15 min */}
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 min-w-0">
             <label htmlFor="arrival-time" className="block text-xs font-semibold text-slate-700 tracking-wide">
               Arrival time (24h)
             </label>
-            <input
-              id="arrival-time"
-              type="time"
-              step="900"
-              value={arrivalTime}
-              onChange={(e) => setArrivalTime(e.target.value)}
-              className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold font-mono tabular-nums text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition-all"
-            />
+            <div className="relative min-w-0">
+              <input
+                id="arrival-time"
+                type="time"
+                step="900"
+                value={arrivalTime}
+                onChange={(e) => setArrivalTime(e.target.value)}
+                className="w-full min-w-0 max-w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold font-mono tabular-nums text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition-all block box-border"
+              />
+            </div>
             <p className="text-[11px] text-slate-500 pl-0.5">24-hour format</p>
           </div>
         </div>
