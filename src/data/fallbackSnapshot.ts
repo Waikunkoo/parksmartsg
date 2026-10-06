@@ -1,6 +1,6 @@
 import { Carpark, EVCharger } from '../types/index.ts';
 import { calculateDistanceMeters } from '../utils/geo.ts';
-import { CARPARK_RATES_DATABASE } from './carparkRates.ts';
+import { CARPARK_RATES_DATABASE, matchCarparkRateDefinition } from './carparkRates.ts';
 import { calculateParkingCost } from '../utils/rateCalculator.ts';
 
 // Destination anchor: Marina Bay Sands (1.2842, 103.8596)
@@ -24,6 +24,70 @@ export interface RawCarparkSnapshot {
 }
 
 export const FALLBACK_CARPARKS_RAW: RawCarparkSnapshot[] = [
+  {
+    id: 'NAC-TAKA-1',
+    name: 'Ngee Ann City (Takashimaya)',
+    agency: 'LTA',
+    area: 'Orchard',
+    latitude: 1.3023,
+    longitude: 103.8348,
+    availableLots: 691,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'ION-1',
+    name: 'ION Orchard',
+    agency: 'LTA',
+    area: 'Orchard',
+    latitude: 1.3040,
+    longitude: 103.8318,
+    availableLots: 285,
+    lotType: 'C',
+    evChargers: [
+      {
+        id: 'ev-ion-1',
+        operator: 'Shell Recharge',
+        plugType: 'Type 2 & CCS2',
+        powerKW: '50 kW DC',
+        status: 'Available',
+        price: '$0.62/kWh'
+      }
+    ]
+  },
+  {
+    id: 'PARAGON-1',
+    name: 'Paragon Shopping Centre',
+    agency: 'COMMERCIAL',
+    area: 'Orchard',
+    latitude: 1.3039,
+    longitude: 103.8358,
+    availableLots: 194,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'WISMA-1',
+    name: 'Wisma Atria',
+    agency: 'COMMERCIAL',
+    area: 'Orchard',
+    latitude: 1.3038,
+    longitude: 103.8333,
+    availableLots: 112,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'SOMERSET-313-1',
+    name: '313@Somerset',
+    agency: 'COMMERCIAL',
+    area: 'Orchard',
+    latitude: 1.3010,
+    longitude: 103.8384,
+    availableLots: 145,
+    lotType: 'C',
+    evChargers: []
+  },
   {
     id: 'MBS-MAIN',
     name: 'Marina Bay Sands',
@@ -170,10 +234,7 @@ export function getFallbackCarparks(
     const distKm = Number((distMeters / 1000).toFixed(2));
 
     // Match rates
-    const norm = raw.name.toLowerCase();
-    const rateDef = CARPARK_RATES_DATABASE.find(r => 
-      norm.includes(r.normalisedName) || r.normalisedName.includes(norm)
-    );
+    const rateDef = matchCarparkRateDefinition(raw.name, raw.agency);
 
     let cost: number | null = null;
     let breakdown = 'Rate unavailable';

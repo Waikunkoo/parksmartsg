@@ -24,6 +24,20 @@ const COMMON_SG_DESTINATIONS = [
     postalCode: '238801'
   },
   {
+    title: 'Takashimaya Shopping Centre',
+    address: '391 Orchard Road, Singapore 238873',
+    latitude: 1.3023,
+    longitude: 103.8347,
+    postalCode: '238873'
+  },
+  {
+    title: 'Ngee Ann City (Takashimaya)',
+    address: '391 Orchard Road, Singapore 238873',
+    latitude: 1.3023,
+    longitude: 103.8347,
+    postalCode: '238873'
+  },
+  {
     title: 'Raffles City',
     address: '252 North Bridge Road, Singapore 179103',
     latitude: 1.2939,

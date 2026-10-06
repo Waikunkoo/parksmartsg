@@ -176,6 +176,29 @@ export function calculateParkingCost(
   }
 
   if (breakdownParts.length === 0) {
+    // If active rules exist for this day but had a gap in time band definition,
+    // compute an approximate estimate using daytime/available rules
+    const fallbackRule = activeRules.find(r => r.type === 'flat_hourly' || r.type === 'first_block') || activeRules[0];
+    if (fallbackRule) {
+      if (fallbackRule.type === 'per_entry') {
+        return {
+          totalCostSGD: fallbackRule.amountSGD,
+          breakdown: `Entry rate $${fallbackRule.amountSGD.toFixed(2)}`,
+          isApproximate: true
+        };
+      } else {
+        const blockMins = fallbackRule.blockMinutes || 60;
+        const blocks = Math.ceil(totalDurationMin / blockMins);
+        const cost = blocks * fallbackRule.amountSGD;
+        const unit = blockMins === 60 ? 'hr' : `${blockMins}m`;
+        return {
+          totalCostSGD: Number(cost.toFixed(2)),
+          breakdown: `${blocks} × ${unit} @ $${fallbackRule.amountSGD.toFixed(2)} = $${cost.toFixed(2)}`,
+          isApproximate: true
+        };
+      }
+    }
+
     return {
       totalCostSGD: 0,
       breakdown: 'Rate unavailable',

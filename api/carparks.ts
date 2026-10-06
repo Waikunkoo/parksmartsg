@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { Carpark, EVCharger } from '../src/types/index.ts';
 import { calculateDistanceMeters } from '../src/utils/geo.ts';
 import { matchCarparkRateDefinition } from '../src/data/carparkRates.ts';
-import { calculateParkingCost } from '../src/utils/rateCalculator.ts';
+import { calculateParkingCost, getDayType } from '../src/utils/rateCalculator.ts';
 import { assignBadgesAndSort, getFallbackCarparks, MBS_ANCHOR } from '../src/data/fallbackSnapshot.ts';
 import { fetchEVChargersNearby } from './ev.ts';
 
@@ -104,7 +104,10 @@ export default async function carparksHandler(req: Request, res: Response) {
       const nowTimeString = new Date().toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit', hour12: false });
 
       for (const item of within1km) {
-        const name = item.Development || `Car Park ${item.CarParkID}`;
+        let name = item.Development || `Car Park ${item.CarParkID}`;
+        if (/ngee ann city/i.test(name) && !/takashimaya/i.test(name)) {
+          name = `${name} (Takashimaya)`;
+        }
 
         // Link EV chargers within 100m
         const linkedEVs: EVCharger[] = [];
@@ -119,7 +122,7 @@ export default async function carparksHandler(req: Request, res: Response) {
         }
 
         // Match rates
-        const rateDef = matchCarparkRateDefinition(name, item.Agency);
+        const rateDef = matchCarparkRateDefinition(name, item.Agency) || matchCarparkRateDefinition(item.Development, item.Agency);
         let cost: number | null = null;
         let breakdown = 'Rate unavailable';
         let publishedRateText: string | undefined = undefined;
@@ -130,7 +133,12 @@ export default async function carparksHandler(req: Request, res: Response) {
           cost = calc.totalCostSGD;
           breakdown = calc.breakdown;
           isApprox = calc.isApproximate;
-          publishedRateText = rateDef.publishedRateText.weekdays;
+          const dayType = getDayType(dateStr);
+          publishedRateText = dayType === 'saturday'
+            ? rateDef.publishedRateText.saturday
+            : dayType === 'sunday_ph'
+              ? rateDef.publishedRateText.sunday_ph
+              : rateDef.publishedRateText.weekdays;
         }
 
         parsedList.push({

@@ -67,17 +67,17 @@ function parseSegmentToRules(str: string, dayType: DayType, defaultStart: string
     }
   }
 
-  // 4. Flat hourly (e.g. "$1.20 per hr" or "$1.20/hr")
+  // 4. Flat hourly (e.g. "$1.20 per hr", "$1.20 for 1 hr", or "$1.20/hr")
   if (rules.length === 0) {
-    const hourly = str.match(/\$([0-9.]+)\s*(?:per\s*hr|\/\s*hr|per\s*hour)/i);
+    const hourly = str.match(/\$([0-9.]+)\s*(?:per\s*hr|\/\s*hr|for\s*1?\s*hr|per\s*hour)/i);
     if (hourly) {
       rules.push({ dayType, startTime: defaultStart, endTime: defaultEnd, type: 'flat_hourly', blockMinutes: 60, amountSGD: parseFloat(hourly[1]) });
     }
   }
 
-  // 5. Flat per 30 mins (e.g. "$1.30 / 30 mins" or "$0.60 per ½ hr")
+  // 5. Flat per 30 mins (e.g. "$1.28 for ½ hr", "$1.30 / 30 mins", "$0.60 per ½ hr", "$0.50 /30 mins")
   if (rules.length === 0) {
-    const halfHour = str.match(/\$([0-9.]+)\s*(?:\/\s*30\s*mins?|per\s*(?:30\s*mins?|½\s*hr|half\s*hr))/i);
+    const halfHour = str.match(/\$([0-9.]+)\s*(?:\/\s*30\s*mins?|(?:per|for|\/)\s*(?:30\s*mins?|½\s*hr|half\s*hr|half\s*hour))/i);
     if (halfHour) {
       rules.push({ dayType, startTime: defaultStart, endTime: defaultEnd, type: 'flat_hourly', blockMinutes: 30, amountSGD: parseFloat(halfHour[1]) });
     }
@@ -96,6 +96,41 @@ function parseSegmentToRules(str: string, dayType: DayType, defaultStart: string
  * Curated high-precision carparks with detailed day/night multi-bracket rules
  */
 const CURATED_CARPARK_RATES: CarparkRateDefinition[] = [
+  {
+    normalisedName: 'ngee ann city',
+    name: 'Ngee Ann City (Takashimaya)',
+    category: 'Orchard Area',
+    aliases: ['takashimaya', 'taka', 'takashimaya shopping centre', 'ngee ann city', '391 orchard road', 'orchard takashimaya', 'takashimaya carpark'],
+    publishedRateText: {
+      weekdays: '12:01am-12:00pm, 2:01pm-5:00pm: $1.28 for ½ hr | 12:01pm-2:00pm, 5:01pm-7:00pm: $1.82 for ½ hr | Aft 7:00pm: $4.28 per entry',
+      saturday: '12:01am-12:00pm, 2:01pm-5:00pm: $2.57 for 1st hr, $1.61/sub ½ hr | 12:01pm-2:00pm, 5:01pm-7:00pm: $3.64 for 1st hr, $2.14/sub ½ hr | Aft 7:00pm: $4.28/entry',
+      sunday_ph: 'Same as Saturday'
+    },
+    rules: [
+      // Weekday morning (07:00-12:00) $1.28 / 30 mins
+      { dayType: 'weekday', startTime: '07:00', endTime: '12:00', type: 'flat_hourly', blockMinutes: 30, amountSGD: 1.28 },
+      // Weekday lunch peak (12:00-14:00) $1.82 / 30 mins
+      { dayType: 'weekday', startTime: '12:00', endTime: '14:00', type: 'flat_hourly', blockMinutes: 30, amountSGD: 1.82 },
+      // Weekday afternoon (14:00-17:00) $1.28 / 30 mins
+      { dayType: 'weekday', startTime: '14:00', endTime: '17:00', type: 'flat_hourly', blockMinutes: 30, amountSGD: 1.28 },
+      // Weekday evening peak (17:00-19:00) $1.82 / 30 mins
+      { dayType: 'weekday', startTime: '17:00', endTime: '19:00', type: 'flat_hourly', blockMinutes: 30, amountSGD: 1.82 },
+      // Weekday overnight (19:00-07:00) $4.28 per entry
+      { dayType: 'weekday', startTime: '19:00', endTime: '07:00', type: 'per_entry', blockMinutes: 720, amountSGD: 4.28 },
+      // Saturday daytime
+      { dayType: 'saturday', startTime: '07:00', endTime: '12:00', type: 'first_block', blockMinutes: 60, amountSGD: 2.57 },
+      { dayType: 'saturday', startTime: '07:00', endTime: '12:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 1.61 },
+      { dayType: 'saturday', startTime: '12:00', endTime: '19:00', type: 'first_block', blockMinutes: 60, amountSGD: 3.64 },
+      { dayType: 'saturday', startTime: '12:00', endTime: '19:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 2.14 },
+      { dayType: 'saturday', startTime: '19:00', endTime: '07:00', type: 'per_entry', blockMinutes: 720, amountSGD: 4.28 },
+      // Sunday & PH
+      { dayType: 'sunday_ph', startTime: '07:00', endTime: '12:00', type: 'first_block', blockMinutes: 60, amountSGD: 2.57 },
+      { dayType: 'sunday_ph', startTime: '07:00', endTime: '12:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 1.61 },
+      { dayType: 'sunday_ph', startTime: '12:00', endTime: '19:00', type: 'first_block', blockMinutes: 60, amountSGD: 3.64 },
+      { dayType: 'sunday_ph', startTime: '12:00', endTime: '19:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 2.14 },
+      { dayType: 'sunday_ph', startTime: '19:00', endTime: '07:00', type: 'per_entry', blockMinutes: 720, amountSGD: 4.28 },
+    ]
+  },
   {
     normalisedName: 'marina bay sands',
     name: 'Marina Bay Sands',
@@ -184,7 +219,8 @@ const CURATED_CARPARK_RATES: CarparkRateDefinition[] = [
  * Common known aliases for landmarks and shopping centres
  */
 const COMMON_ALIASES: Record<string, string[]> = {
-  'ngee ann city': ['takashimaya', 'taka', 'ngee ann city'],
+  'ngee ann city': ['takashimaya', 'taka', 'takashimaya shopping centre', 'ngee ann city', '391 orchard road', 'orchard takashimaya'],
+  'takashimaya': ['takashimaya', 'taka', 'takashimaya shopping centre', 'ngee ann city', '391 orchard road', 'orchard takashimaya'],
   'ion orchard': ['ion', 'ion orchard'],
   'vivocity': ['vivo', 'harbourfront'],
   'jurong point shopping centre': ['jurong point', 'jp'],
