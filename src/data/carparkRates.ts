@@ -97,6 +97,66 @@ function parseSegmentToRules(str: string, dayType: DayType, defaultStart: string
  */
 const CURATED_CARPARK_RATES: CarparkRateDefinition[] = [
   {
+    normalisedName: 'the strategy',
+    name: 'The Strategy (International Business Park)',
+    category: 'West',
+    aliases: ['the strategy', 'strategy', 'strategy ibp', 'international business park', 'ibp', '2 international business park', 'the strategy jurong east'],
+    publishedRateText: {
+      weekdays: 'Mon-Sat 07:00-22:00: $2.00 for 1st hr, $1.50/subsequent 30 mins | 22:01-07:00: $2.00 per entry',
+      saturday: 'Mon-Sat 07:00-22:00: $2.00 for 1st hr, $1.50/subsequent 30 mins | 22:01-07:00: $2.00 per entry',
+      sunday_ph: '07:00-07:00 next day: $2.00 per entry'
+    },
+    rules: [
+      { dayType: 'weekday', startTime: '07:00', endTime: '22:00', type: 'first_block', blockMinutes: 60, amountSGD: 2.00 },
+      { dayType: 'weekday', startTime: '07:00', endTime: '22:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 1.50 },
+      { dayType: 'weekday', startTime: '22:00', endTime: '07:00', type: 'per_entry', blockMinutes: 540, amountSGD: 2.00 },
+      { dayType: 'saturday', startTime: '07:00', endTime: '22:00', type: 'first_block', blockMinutes: 60, amountSGD: 2.00 },
+      { dayType: 'saturday', startTime: '07:00', endTime: '22:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 1.50 },
+      { dayType: 'saturday', startTime: '22:00', endTime: '07:00', type: 'per_entry', blockMinutes: 540, amountSGD: 2.00 },
+      { dayType: 'sunday_ph', startTime: '00:00', endTime: '24:00', type: 'per_entry', blockMinutes: 1440, amountSGD: 2.00 }
+    ],
+    defaultAgency: 'COMMERCIAL'
+  },
+  {
+    normalisedName: 'the synergy',
+    name: 'The Synergy (International Business Park)',
+    category: 'West',
+    aliases: ['the synergy', 'synergy', 'synergy ibp', '1 international business park', 'the synergy jurong east'],
+    publishedRateText: {
+      weekdays: 'Mon-Sat 07:00-22:00: $2.00 for 1st hr, $1.50/subsequent 30 mins | 22:01-07:00: $2.00 per entry',
+      saturday: 'Mon-Sat 07:00-22:00: $2.00 for 1st hr, $1.50/subsequent 30 mins | 22:01-07:00: $2.00 per entry',
+      sunday_ph: '07:00-07:00 next day: $2.00 per entry'
+    },
+    rules: [
+      { dayType: 'weekday', startTime: '07:00', endTime: '22:00', type: 'first_block', blockMinutes: 60, amountSGD: 2.00 },
+      { dayType: 'weekday', startTime: '07:00', endTime: '22:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 1.50 },
+      { dayType: 'weekday', startTime: '22:00', endTime: '07:00', type: 'per_entry', blockMinutes: 540, amountSGD: 2.00 },
+      { dayType: 'saturday', startTime: '07:00', endTime: '22:00', type: 'first_block', blockMinutes: 60, amountSGD: 2.00 },
+      { dayType: 'saturday', startTime: '07:00', endTime: '22:00', type: 'subsequent_block', blockMinutes: 30, amountSGD: 1.50 },
+      { dayType: 'saturday', startTime: '22:00', endTime: '07:00', type: 'per_entry', blockMinutes: 540, amountSGD: 2.00 },
+      { dayType: 'sunday_ph', startTime: '00:00', endTime: '24:00', type: 'per_entry', blockMinutes: 1440, amountSGD: 2.00 }
+    ],
+    defaultAgency: 'COMMERCIAL'
+  },
+  {
+    normalisedName: 'german centre',
+    name: 'German Centre (International Business Park)',
+    category: 'West',
+    aliases: ['german centre', 'german center', 'german centre ibp', '25 international business park'],
+    publishedRateText: {
+      weekdays: 'Mon-Fri 07:00-17:00: $2.50 per hr | 17:00-07:00: $2.50 per entry',
+      saturday: '07:00-01:00 next day: $2.50 per hr',
+      sunday_ph: '07:00-07:00 next day: $2.50 per entry'
+    },
+    rules: [
+      { dayType: 'weekday', startTime: '07:00', endTime: '17:00', type: 'flat_hourly', blockMinutes: 60, amountSGD: 2.50 },
+      { dayType: 'weekday', startTime: '17:00', endTime: '07:00', type: 'per_entry', blockMinutes: 840, amountSGD: 2.50 },
+      { dayType: 'saturday', startTime: '07:00', endTime: '01:00', type: 'flat_hourly', blockMinutes: 60, amountSGD: 2.50 },
+      { dayType: 'sunday_ph', startTime: '00:00', endTime: '24:00', type: 'per_entry', blockMinutes: 1440, amountSGD: 2.50 }
+    ],
+    defaultAgency: 'COMMERCIAL'
+  },
+  {
     normalisedName: 'ngee ann city',
     name: 'Ngee Ann City (Takashimaya)',
     category: 'Orchard Area',
@@ -219,6 +279,9 @@ const CURATED_CARPARK_RATES: CarparkRateDefinition[] = [
  * Common known aliases for landmarks and shopping centres
  */
 const COMMON_ALIASES: Record<string, string[]> = {
+  'the strategy': ['the strategy', 'strategy', 'strategy ibp', 'international business park', 'ibp', '2 international business park'],
+  'the synergy': ['the synergy', 'synergy', 'synergy ibp', 'international business park', 'ibp', '1 international business park'],
+  'german centre': ['german centre', 'german center', 'german centre ibp', '25 international business park'],
   'ngee ann city': ['takashimaya', 'taka', 'takashimaya shopping centre', 'ngee ann city', '391 orchard road', 'orchard takashimaya'],
   'takashimaya': ['takashimaya', 'taka', 'takashimaya shopping centre', 'ngee ann city', '391 orchard road', 'orchard takashimaya'],
   'ion orchard': ['ion', 'ion orchard'],

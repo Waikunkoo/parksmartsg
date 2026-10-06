@@ -25,6 +25,112 @@ export interface RawCarparkSnapshot {
 
 export const FALLBACK_CARPARKS_RAW: RawCarparkSnapshot[] = [
   {
+    id: 'IBP-STRATEGY',
+    name: 'The Strategy (International Business Park)',
+    agency: 'COMMERCIAL',
+    area: 'Jurong East',
+    latitude: 1.3286,
+    longitude: 103.7462,
+    availableLots: 420,
+    lotType: 'C',
+    evChargers: [
+      {
+        id: 'ev-strategy-1',
+        operator: 'SP Mobility',
+        plugType: 'Type 2 & CCS2',
+        powerKW: '50 kW DC',
+        status: 'Available',
+        price: '$0.58/kWh'
+      }
+    ]
+  },
+  {
+    id: 'IBP-SYNERGY',
+    name: 'The Synergy (International Business Park)',
+    agency: 'COMMERCIAL',
+    area: 'Jurong East',
+    latitude: 1.3252,
+    longitude: 103.7490,
+    availableLots: 310,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'IBP-GERMAN',
+    name: 'German Centre (International Business Park)',
+    agency: 'COMMERCIAL',
+    area: 'Jurong East',
+    latitude: 1.3277,
+    longitude: 103.7460,
+    availableLots: 260,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'TG-286A',
+    name: 'Blk 286A Toh Guan Road MSCP (J80)',
+    agency: 'HDB',
+    area: 'Jurong East',
+    latitude: 1.3320,
+    longitude: 103.7468,
+    availableLots: 175,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'TG-288A',
+    name: 'Blk 288A Toh Guan Road MSCP (J82)',
+    agency: 'HDB',
+    area: 'Jurong East',
+    latitude: 1.3335,
+    longitude: 103.7475,
+    availableLots: 148,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'IMM-1',
+    name: 'IMM Building',
+    agency: 'COMMERCIAL',
+    area: 'Jurong East',
+    latitude: 1.3349,
+    longitude: 103.7469,
+    availableLots: 512,
+    lotType: 'C',
+    evChargers: [
+      {
+        id: 'ev-imm-1',
+        operator: 'Shell Recharge',
+        plugType: 'CCS2 (DC)',
+        powerKW: '50 kW DC',
+        status: 'Available',
+        price: '$0.60/kWh'
+      }
+    ]
+  },
+  {
+    id: 'WESTGATE-1',
+    name: 'Westgate',
+    agency: 'COMMERCIAL',
+    area: 'Jurong East',
+    latitude: 1.3345,
+    longitude: 103.7428,
+    availableLots: 385,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
+    id: 'JEM-1',
+    name: 'Jem',
+    agency: 'COMMERCIAL',
+    area: 'Jurong East',
+    latitude: 1.3331,
+    longitude: 103.7436,
+    availableLots: 395,
+    lotType: 'C',
+    evChargers: []
+  },
+  {
     id: 'TM-662A',
     name: 'Blk 662A Tampines St 64 MSCP (TM66)',
     agency: 'HDB',

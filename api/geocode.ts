@@ -78,6 +78,27 @@ const COMMON_SG_DESTINATIONS = [
     latitude: 1.3331,
     longitude: 103.7436,
     postalCode: '608549'
+  },
+  {
+    title: 'International Business Park (Jurong East)',
+    address: 'International Business Park, Singapore 609928',
+    latitude: 1.3252,
+    longitude: 103.7490,
+    postalCode: '609928'
+  },
+  {
+    title: 'The Strategy (International Business Park)',
+    address: '2 International Business Park, Singapore 609930',
+    latitude: 1.3286,
+    longitude: 103.7462,
+    postalCode: '609930'
+  },
+  {
+    title: 'The Synergy (International Business Park)',
+    address: '1 International Business Park, Singapore 609917',
+    latitude: 1.3252,
+    longitude: 103.7490,
+    postalCode: '609917'
   }
 ];
 
